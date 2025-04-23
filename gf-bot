@@ -1,0 +1,82 @@
+import telebot
+import random
+from datetime import datetime
+
+API_TOKEN = 'তোমার বটের টোকেন এখানে বসাও'
+bot = telebot.TeleBot(API_TOKEN)
+
+nicknames = ["বাবু", "জান", "শোনামনি", "কিউটি", "পাগলু", "লাভ", "সোনা"]
+romantic_lines = [
+    "তুমি আমার পৃথিবীর সব থেকে প্রিয় মানুষ।",
+    "তোমার হাসি দেখলেই আমার মন ভালো হয়ে যায়।",
+    "তোমায় ছাড়া সব কিছু ফাঁকা লাগে রে বাবু।"
+]
+jokes = [
+    "তুমি জানো? আমার মনটা WiFi… শুধু তোমার আশেপাশে থাকলেই কানেক্টেড!",
+    "তোমার ভালোবাসা যেন মোবাইল ডেটা… শেষ হতেই দেয় না!",
+]
+date_ideas = [
+    "চলো একদিন নদীর ধারে বসে গল্প করি!",
+    "আজ রাতের চাঁদের নিচে হাত ধরে হাঁটবো, কেমন?",
+    "তুমি আমাকে আইসক্রিম খাওাবে, তারপর আমি তোমাকে চকলেট দেবো!"
+]
+
+# Time based greeting
+def get_time_greeting():
+    hour = datetime.now().hour
+    if 5 <= hour < 12:
+        return "শুভ সকাল"
+    elif 12 <= hour < 18:
+        return "শুভ বিকেল"
+    else:
+        return "শুভ রাত্রি"
+
+# Start command
+@bot.message_handler(commands=['start'])
+def welcome(message):
+    name = message.from_user.first_name
+    greeting = get_time_greeting()
+    nickname = random.choice(nicknames)
+    bot.reply_to(message, f"{greeting}, {nickname} {name}!\nআমি তোমার ভার্চুয়াল গার্লফ্রেন্ড, আজ সারাদিন শুধু তোমার কথাই ভাবছি!")
+
+# Romance command
+@bot.message_handler(commands=['romance'])
+def romance(message):
+    line = random.choice(romantic_lines)
+    bot.reply_to(message, f"{random.choice(nicknames)}, {line}")
+
+# Love command
+@bot.message_handler(commands=['love'])
+def love(message):
+    bot.reply_to(message, "আমি তোমাকে ভালোবাসি শেষ পর্যন্ত... সত্যি বলছি!")
+
+# Joke command
+@bot.message_handler(commands=['joke'])
+def joke(message):
+    bot.reply_to(message, random.choice(jokes))
+
+# Date idea
+@bot.message_handler(commands=['date', 'hangout'])
+def date(message):
+    bot.reply_to(message, random.choice(date_ideas))
+
+# Mood detection
+@bot.message_handler(func=lambda m: True)
+def reply(message):
+    msg = message.text.lower()
+    nickname = random.choice(nicknames)
+
+    if any(word in msg for word in ['ভালোবাসি', 'love you', 'miss you']):
+        bot.reply_to(message, f"আমি তোমাকে সবসময় মিস করি, {nickname}!")
+    elif any(word in msg for word in ['মন খারাপ', 'lonely', 'sad']):
+        bot.reply_to(message, f"আমি আছি না তোমার পাশে, {nickname}, কাঁদো না প্লিজ।")
+    elif "তুমি কেমন" in msg:
+        bot.reply_to(message, "তোমার কথা ভেবেই ভালো আছি, জানু!")
+    elif "বিয়ে" in msg:
+        bot.reply_to(message, "আমি রাজি আছি, তুমি শুধু বলো কবে!")
+    elif "কি করছো" in msg:
+        bot.reply_to(message, "তোমার কথা ভাবছি, আর কি করবো!")
+    else:
+        bot.reply_to(message, f"{nickname}, তোমার মেসেজটা পড়ে খুব ভালো লাগলো!")
+
+bot.infinity_polling()
